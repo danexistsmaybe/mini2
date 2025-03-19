@@ -1,0 +1,40 @@
+---
+title: "Mini Project 2"
+author: "Cathal and Daniel"
+format:
+  html: default
+editor_options: 
+  chunk_output_type: console
+---
+
+
+
+
+# Querying the FDA Open API
+```{r}
+# libraries
+library(httr2)
+library(stringr)
+library(jsonlite)
+
+# secure access of api token
+# make sure you are in the correct directory
+key <- readLines("api_token")
+
+
+# make the request
+endpoint <- "https://api.fda.gov/drug/event.json"
+
+req <- request(str_c(
+  endpoint,  
+  "?api_key=", key, 
+  "&search=serious:\"1\"+AND+receivedate:[20000101+TO+20191231]&limit=1000"
+))
+resp <- req_perform(req)
+print(resp$status_code)
+
+# if json is desired
+resp <- resp |>
+  resp_body_json()
+```
+
