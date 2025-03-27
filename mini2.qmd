@@ -2,13 +2,16 @@
 title: "Mini Project 2"
 author: "Cathal and Daniel"
 format:
-  html: default
+  pdf: default
 editor_options: 
   chunk_output_type: console
 ---
 
 
 ```{r}
+#| eval: FALSE
+#| message: FALSE
+
 # libraries
 library(httr2)
 library(stringr)
@@ -22,15 +25,15 @@ Thus, we decided to scrape reports about adverse drug effects on patients, and f
 
 
 ```{r}
-# secure access of api token (api_token is in .gitignore)
 key <- readLines("api_token") #Daniel key
-
-key <- "PDPhCwLKWX5EzEoCNrgEhaeVfK5ojIypQOHraqB8" #Cathal key
+key <- "PDPhCwLKWX5EzEoCNrgEhaeVfK5ojIypQOHraqB8" #Cathal key (shhh)
 ```
 
 
 # Querying the FDA Open API
 ```{r}
+#| eval: FALSE
+#| message: FALSE
 
 #Function to get data from the API. 2000 - 2020, numObservations <= 1000
 
@@ -79,7 +82,9 @@ get_fda_data <- function(startYear, endYear, numObservations) {
     }
     
     if(length(resp$results[[i]]$patient$reaction) == 2) {
-      reaction[i-1] <- str_c(resp$results[[i]]$patient$reaction[[1]]$reactionmeddrapt, ", ", resp$results[[i]]$patient$reaction[[2]]$reactionmeddrapt)
+      reaction[i-1] <- str_c(resp$results[[i]]$patient$reaction[[1]]
+                             $reactionmeddrapt, ", ",resp$results[[i]]$
+                               patient$reaction[[2]]$reactionmeddrapt)
     } else if(length(resp$results[[i]]$patient$reaction) == 1) {
       reaction[i-1] <- resp$results[[i]]$patient$reaction[[1]]$reactionmeddrapt
     } else {
@@ -115,22 +120,19 @@ write.csv(drugs, "drugs_tbl.csv")
 
 ```
 
-# Using the Data: Demonstrations
 
+Our Data:
 
 ```{r}
-drugs <- read_csv("drugs_tbl.csv")
+#| message: FALSE
 
+library(tidyverse)
 
-drugs |>
-  mutate(drugName = fct_lump_n(drugName, 100)) |>
-  group_by(patientSex) |>
-  summarize(n = n()) |>
-  ggplot(aes(x = "", y = n, fill= patientSex)) +
-    geom_bar(stat="identity", width=1) +
-    coord_polar("y", start=0) #+
-    #theme(legend.position = "none") #+
-    #scale_fill_viridis_d(option="E")
+drugs <- read.csv("drugs_tbl.csv")
+
+drugs |> 
+  slice_head(n=6)
+
 ```
 
 
