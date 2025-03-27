@@ -18,13 +18,13 @@ library(jsonlite)
 
 We chose to gather data from the openFDA API. This API serves public data from the Food and Drug Administration about drugs, devices, and foods. It only has publicly available data, so there are no sensitive personal details. We hope to use this data to show a correlation between age or sex and certain adverse effects. We also want to see if some drugs are more likely to cause serious side effects compared to other drugs, and what reactions are most common.
 
-We chose to scrape reports about adverse drug effects on patients, and filter to only include instances where the patient had severe side effects (Death, life threatening condition, hospitalization, etc). Each report has a unique report ID, details about the patients age and sex, what drug they used, how serious the side effects were, and what their reaction to the drug was. We can group the data by age group, sex, medication name, and create plots to show the size of each group and see if there is a causal relationship between 2 or more of the variables. 
+Thus, we decided to scrape reports about adverse drug effects on patients, and filter to only include instances where the patient had severe side effects (Death, life threatening condition, hospitalization, etc). Each report has a unique report ID, details about the patients age and sex, what drug they used, how serious the side effects were, and what their reaction to the drug was. We can group the data by age group, sex, medication name, and create plots to show the size of each group and see if there is a causal relationship between 2 or more of the variables. 
 
 
 ```{r}
-# secure access of api token
-# make sure you are in the correct directory
+# secure access of api token (api_token is in .gitignore)
 key <- readLines("api_token") #Daniel key
+
 key <- "PDPhCwLKWX5EzEoCNrgEhaeVfK5ojIypQOHraqB8" #Cathal key
 ```
 
@@ -114,4 +114,23 @@ drugs <- drugs |>
 write.csv(drugs, "drugs_tbl.csv")
 
 ```
+
+# Using the Data: Demonstrations
+
+
+```{r}
+drugs <- read_csv("drugs_tbl.csv")
+
+
+drugs |>
+  mutate(drugName = fct_lump_n(drugName, 100)) |>
+  group_by(patientSex) |>
+  summarize(n = n()) |>
+  ggplot(aes(x = "", y = n, fill= patientSex)) +
+    geom_bar(stat="identity", width=1) +
+    coord_polar("y", start=0) #+
+    #theme(legend.position = "none") #+
+    #scale_fill_viridis_d(option="E")
+```
+
 
