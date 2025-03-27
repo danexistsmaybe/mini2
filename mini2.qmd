@@ -2,13 +2,16 @@
 title: "Mini Project 2"
 author: "Cathal and Daniel"
 format:
-  html: default
+  pdf: default
 editor_options: 
   chunk_output_type: console
 ---
 
 
 ```{r}
+#| eval: FALSE
+#| message: FALSE
+
 # libraries
 library(httr2)
 library(stringr)
@@ -22,6 +25,9 @@ We chose to scrape reports about adverse drug effects on patients, and filter to
 
 
 ```{r}
+#| eval: FALSE
+#| message: FALSE
+
 # secure access of api token
 # make sure you are in the correct directory
 key <- readLines("api_token") #Daniel key
@@ -31,6 +37,8 @@ key <- "PDPhCwLKWX5EzEoCNrgEhaeVfK5ojIypQOHraqB8" #Cathal key (shhh)
 
 # Querying the FDA Open API
 ```{r}
+#| eval: FALSE
+#| message: FALSE
 
 #Function to get data from the API. 2000 - 2020, numObservations <= 1000
 
@@ -79,7 +87,9 @@ get_fda_data <- function(startYear, endYear, numObservations) {
     }
     
     if(length(resp$results[[i]]$patient$reaction) == 2) {
-      reaction[i-1] <- str_c(resp$results[[i]]$patient$reaction[[1]]$reactionmeddrapt, ", ", resp$results[[i]]$patient$reaction[[2]]$reactionmeddrapt)
+      reaction[i-1] <- str_c(resp$results[[i]]$patient$reaction[[1]]
+                             $reactionmeddrapt, ", ",resp$results[[i]]$
+                               patient$reaction[[2]]$reactionmeddrapt)
     } else if(length(resp$results[[i]]$patient$reaction) == 1) {
       reaction[i-1] <- resp$results[[i]]$patient$reaction[[1]]$reactionmeddrapt
     } else {
@@ -114,4 +124,19 @@ drugs <- drugs |>
 write.csv(drugs, "drugs_tbl.csv")
 
 ```
+
+Our Data:
+
+```{r}
+#| message: FALSE
+
+library(tidyverse)
+
+drugs <- read.csv("drugs_tbl.csv")
+
+drugs |> 
+  slice_head(n=6)
+
+```
+
 
