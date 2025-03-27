@@ -25,7 +25,7 @@ We chose to scrape reports about adverse drug effects on patients, and filter to
 # secure access of api token
 # make sure you are in the correct directory
 key <- readLines("api_token") #Daniel key
-key <- "PDPhCwLKWX5EzEoCNrgEhaeVfK5ojIypQOHraqB8" #Cathal key
+key <- "PDPhCwLKWX5EzEoCNrgEhaeVfK5ojIypQOHraqB8" #Cathal key (shhh)
 ```
 
 
