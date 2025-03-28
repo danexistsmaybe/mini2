@@ -16,6 +16,7 @@ editor_options:
 library(httr2)
 library(stringr)
 library(jsonlite)
+library(tidyverse)
 ```
 
 
@@ -132,7 +133,65 @@ drugs <- read.csv("drugs_tbl.csv")
 
 drugs |> 
   slice_head(n=6)
+```
+
+# Demonstrations of the Data
+
+```{r}
+library(treemapify)
+
+
+drugs |>
+  mutate(drugName = as.character(fct_lump_n(drugName, 100))) |>
+  group_by(drugName) |>
+  summarize(n = n()) |>
+  mutate(drugName = ifelse(
+    nchar(drugName)>7, 
+    str_c(substr(drugName, start=1, stop=4), "…"),
+    drugName
+  )) |>
+  ggplot(aes(area = n, fill = drugName, label = drugName)) +
+    geom_treemap() +
+    geom_treemap_text(colour = "white", place = "centre") +
+    labs(title = "Drug Representation Among Serious Effects") +
+    theme_minimal() +
+    scale_fill_viridis_d(option = "G") +
+    theme(legend.position = "none")
+
+drugs |>
+  filter(reaction == "Death") |>
+  mutate(drugName = as.character(fct_lump_min(drugName, 1))) |>
+  group_by(drugName) |>
+  summarize(n = n()) |>
+  mutate(drugName = ifelse(
+    nchar(drugName)>10, 
+    str_c(substr(drugName, start=1, stop=6), "…"),
+    drugName
+  )) |>
+  ggplot(aes(area = n, fill = drugName, label = drugName)) +
+    geom_treemap() +
+    geom_treemap_text(colour = "white", place = "centre") +
+    labs(title = "Drug Representation Among Deaths") +
+    theme_minimal() +
+    scale_fill_viridis_d(option = "A") +
+    theme(legend.position = "none")
+
+
 
 ```
+
+These tree maps give some indication of which drugs caused the most serious side effects. In both plots, we can see that the distribution is relatively even among the drugs, as it seems that most of them only occur one or two times. Lipitor stands out as having the most incidents, and we can see that it also has one death associated with it in the second plot. This plot also reveals that Glivec, while it had appeared benign enough, actually caused the highest number of deaths in the data. 
+
+```{r}
+drugs |>
+  filter(!is.na(patientAge) & patientAge < 100) |>
+  ggplot(aes(x = patientAge)) +
+    geom_density(fill = "lavender", color = "darkblue", size = 1) + 
+    theme_minimal()
+```
+
+Unsurprisingly, the most common age for incidents in the data set is in the sixties. However, this plot also highlights that some of the drugs affected children.
+
+
 
 
