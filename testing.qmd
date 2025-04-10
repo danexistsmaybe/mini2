@@ -1,7 +1,37 @@
 ---
  title: "testing"
  format: pdf
+editor_options: 
+  chunk_output_type: console
 ---
  
  this is NOT a test
-  
+
+PDPhCwLKWX5EzEoCNrgEhaeVfK5ojIypQOHraqB8
+
+```{r}
+#| include: FALSE
+
+library(tidyverse)
+library(stringr)
+library(httr2)
+library(httr)
+```
+
+```{r}
+
+url <- "https://api.fda.gov/drug/event.json?search=receivedate:[20040101+TO+20081231]&limit=100"
+
+output <- GET(url)
+
+output
+
+details <- content(output, "parse")
+
+details$results$
+
+```
+
+
+
+

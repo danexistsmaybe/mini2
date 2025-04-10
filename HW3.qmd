@@ -1,0 +1,81 @@
+---
+title: "HW3"
+format: 
+  pdf: default
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#| include: FALSE
+
+library(tidyverse)
+library(stringr)
+library(httr2)
+library(httr)
+```
+
+2. Write a function to give choices about year, county, and variables
+
+```{r}
+
+CENSUS_API_KEY <- Sys.getenv("CENSUS_API_KEY")
+
+get_census_data <- function(start_year, end_year, county, variables) {
+
+  big_list <- tibble(
+    year = double(),
+    name = character(),
+    population = double(),
+    median_income = double(),
+    tract = character()
+  )
+  
+  for(yr in start_year:end_year) {
+    # Finally using httr
+  url <- str_c("https://api.census.gov/data/", yr, "/acs/acs5?get=NAME,B01003_001E,B19013_001E&for=tract:*&in=state:27&in=county:053", "&key=", CENSUS_API_KEY)
+  acs5 <- GET(url)
+  details <- content(acs5, "parsed")
+  # details 
+  details[[1]]  # variable names
+  details[[2]]  # list with information on 1st tract
+  
+  year = double()
+  name = character()
+  population = double()
+  median_income = double()
+  tract = character()
+  
+  for(i in 2:330) {
+    year[i-1] <- yr
+    name[i-1] <- details[[i]][[1]][1]
+    population[i-1] <- details[[i]][[2]][1]
+    median_income[i-1] <- details[[i]][[3]][1]
+    tract[i-1] <- details[[i]][[6]][1]
+  }
+  
+  hennepin_httr_loop <- tibble(
+    year = year,
+    name = name,
+    population = parse_number(population),
+    median_income = parse_number(median_income),
+    tract = tract
+  )
+  
+  big_list <- big_list |> 
+    full_join(hennepin_httr_loop)
+  
+  }
+  
+  big_list
+
+}
+
+view(get_census_data(2017, 2021, "county", "variables"))
+
+```
+
+3. Use your function from (2) along with `map` and `list_rbind` to build a data set for Rice county for the years 2019-2021
+
+
+
